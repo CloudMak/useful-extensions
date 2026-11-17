@@ -1,4 +1,4 @@
-# Fish Voiceover for DaVinci Resolve
+﻿# Fish Voiceover for DaVinci Resolve
 
 Generate speech with [fish.audio](https://fish.audio) right from the Resolve timeline: the audio is saved to
 `<Output root>\Projects\<project name>\` and inserted at the playhead, with the voiced text as a clip marker.
@@ -60,7 +60,7 @@ The last Voice, Volume, Speed and Model are remembered. **Cancel** or **Esc** cl
 - **Timeline:** the clip starts exactly at the playhead, on the first unlocked audio track that is empty for the clip's
   length; if all are busy, a new stereo audio track is added.
 - **Media Pool:** the clip goes to the **Fish Voiceover** bin.
-- **Text:** a blue marker on the clip — name is the start of the phrase, note is the full text.
+- **Text:** a blue marker on the clip named `text`; the voiced text is in its **Notes**.
   Hover the marker or double-click it to read the text; all texts are listed in **Index > Markers** on the Edit page.
 
 ### Voices and other settings

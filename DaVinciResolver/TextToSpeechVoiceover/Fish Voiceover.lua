@@ -121,11 +121,9 @@ local function main()
   if not placed or not placed[1] then
     return say("Saved and imported into the '" .. BIN_NAME .. "' bin, but could not place it on the timeline:\n" .. path)
   end
-  -- Voiced text as a marker on the clip: name = start of the phrase, note = full text.
+  -- Voiced text as a marker on the clip: Name = "text", Notes = the voiced text.
   if text ~= "" then
-    local title = text:gsub("%s+", " ")
-    if #title > 60 then title = title:sub(1, 60):gsub("[\128-\191]*$", ""):gsub("[\192-\255]$", "") .. "…" end
-    placed[1]:AddMarker(0, "Blue", title, text, 1)
+    placed[1]:AddMarker(0, "Blue", "text", text, 1)
   end
   tl:SetCurrentTimecode(tc)
 end

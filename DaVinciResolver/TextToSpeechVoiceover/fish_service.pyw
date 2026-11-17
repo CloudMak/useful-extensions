@@ -294,6 +294,40 @@ class VoiceoverWindow(tk.Toplevel):
         messagebox.showerror("Fish Voiceover", msg, parent=self)
 
 
+# Tk binds Ctrl+V/C/X/A/Z to Latin keysyms only, so they die on the Russian layout.
+# Map them by physical key (Windows virtual-key codes) and add a right-click menu.
+EDIT_KEYS = {86: "<<Paste>>", 67: "<<Copy>>", 88: "<<Cut>>", 65: "<<SelectAll>>", 90: "<<Undo>>"}
+
+
+def install_clipboard_support(root):
+    def on_ctrl_key(event):
+        if event.keysym.lower() in ("v", "c", "x", "a", "z"):
+            return None  # Latin layout: Tk's own bindings already handle it
+        action = EDIT_KEYS.get(event.keycode)
+        if action and isinstance(event.widget, (tk.Text, tk.Entry, ttk.Entry)):
+            event.widget.event_generate(action)
+            return "break"
+        return None
+
+    def on_right_click(event):
+        w = event.widget
+        if not isinstance(w, (tk.Text, tk.Entry, ttk.Entry)):
+            return
+        w.focus_set()
+        menu = tk.Menu(w, tearoff=0)
+        for label, action in (("Cut", "<<Cut>>"), ("Copy", "<<Copy>>"), ("Paste", "<<Paste>>"), (None, None), ("Select All", "<<SelectAll>>")):
+            if label:
+                menu.add_command(label=label, command=lambda a=action: w.event_generate(a))
+            else:
+                menu.add_separator()
+        menu.tk_popup(event.x_root, event.y_root)
+
+    root.bind_all("<Control-KeyPress>", on_ctrl_key)
+    root.bind_all("<Button-3>", on_right_click)
+    for cls in ("Text", "Entry", "TEntry"):
+        root.bind_class(cls, "<Control-a>", lambda e: (e.widget.event_generate("<<SelectAll>>"), "break")[1])
+
+
 def decode_line(raw):
     try:
         return raw.decode("utf-8")
@@ -306,6 +340,7 @@ class Service:
         os.makedirs(QUEUE, exist_ok=True)
         self.root = tk.Tk()
         self.root.withdraw()
+        install_clipboard_support(self.root)
         self.seen = set()
         self.pos = os.path.getsize(RESOLVE_LOG) if os.path.exists(RESOLVE_LOG) else 0
         self.buf = b""
